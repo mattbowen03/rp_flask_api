@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import abort, make_response
+from flask import abort, make_response, request
 
 def get_timestamp():
     return datetime.now().strftime(("%Y-%m-%d %H:%M:%S"))
@@ -25,9 +25,10 @@ PEOPLE = {
 def read_all():
     return list(PEOPLE.values())
 
-def create(person):
-    lname = person.get("lname")
-    fname = person.get("fname", "")
+def create():
+    person = request.json
+    lname = person.get("lname", "test")
+    fname = person.get("fname", "123")
 
     if lname and lname not in PEOPLE:
         PEOPLE[lname] = {
@@ -50,7 +51,8 @@ def read_one(lname):
             404, f"Person with last name {lname} not found"
         )
 
-def update(lname, person):
+def update(lname):
+    person = request.json
     if lname in PEOPLE:
         PEOPLE[lname]["fname"] = person.get("fname", PEOPLE[lname]["fname"])
         PEOPLE[lname]["timestamp"] = get_timestamp()
